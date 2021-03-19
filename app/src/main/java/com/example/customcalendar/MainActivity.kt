@@ -32,9 +32,6 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         calc.time = this.selectedDate
 
         this.selectTomorrowWeekDays()
-
-        Log.d("min_date", this.minimumSelectDate.toString())
-
         this.setCalendarMonthView(this.selectedDate)
         this.calendarActionListener()
         this.applyButtonListener()
@@ -86,8 +83,9 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
             cal.add(Calendar.DATE, 1)
             this.selectedDate = cal.time
             this.minimumSelectDate = cal.time
-            if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) return
+            if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) break
         }
+        this.calc.time = this.selectedDate
     }
 
     private fun initDaysInMonth(date: Date): ArrayList<CalendarCell> {
