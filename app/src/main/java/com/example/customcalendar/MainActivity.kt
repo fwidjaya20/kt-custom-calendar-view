@@ -1,7 +1,6 @@
 package com.example.customcalendar
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
-import java.time.Year
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -18,8 +16,6 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
     private lateinit var displayMonthYear: TextView
     private lateinit var calendarGrid: RecyclerView
     private lateinit var selectedDate: Date
-    var month = 0
-    var year = 0
     var calc: Calendar = Calendar.getInstance()
     var staticCal: Calendar = Calendar.getInstance()
     var default = ""
@@ -32,34 +28,33 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         this.calendarGrid = findViewById(R.id.calendarGrid)
         this.selectedDate = Date()
         calc.time = this.selectedDate
-        month = calc.get(Calendar.MONTH)
-        year = calc.get(Calendar.YEAR)
+
         this.selectTomorrowWeekDays()
         this.setCalendarMonthView(this.selectedDate)
+        this.calendarActionListener()
+        this.applyButtonListener()
+    }
+
+    private fun calendarActionListener() {
         nextButton.setOnClickListener {
-            month ++
-            setToCalendar()
-        }
-        previousButton.setOnClickListener {
-            var defaultCal = Calendar.getInstance()
-            defaultCal.add(Calendar.DATE,1)
-            if (month > defaultCal.get(Calendar.MONTH)){
-                month--
-                setToCalendar()
-            }
+            this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) + 1)
+            this.setCalendarMonthView(calc.time)
         }
 
-        btn_apply.setOnClickListener {
-            Toast.makeText(this,default,Toast.LENGTH_SHORT).show()
+        previousButton.setOnClickListener {
+            if (calc.time < Date()) {
+                return@setOnClickListener
+            }
+
+            this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) - 1)
+            this.setCalendarMonthView(calc.time)
         }
     }
 
-    private fun setToCalendar(){
-        calc.set(Calendar.MONTH, month)
-        calc.set(Calendar.YEAR,year)
-        val date: Date = calc.time
-        Log.i("date_is","month $date month $month")
-        this.setCalendarMonthView(date)
+    private fun applyButtonListener() {
+        btn_apply.setOnClickListener {
+            Toast.makeText(this, default, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setCalendarMonthView(dateInput : Date) {
@@ -121,8 +116,8 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         }
     }
 
-    fun filterPosition(datas : ArrayList<CalendarCell>) : Int {
-        var list = datas.find { it.isDefault }
-        return datas.indexOf(list)
+    private fun filterPosition(datum : ArrayList<CalendarCell>) : Int {
+        val list = datum.find { it.isDefault }
+        return datum.indexOf(list)
     }
 }
