@@ -16,6 +16,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
     private lateinit var displayMonthYear: TextView
     private lateinit var calendarGrid: RecyclerView
     private lateinit var selectedDate: Date
+    private lateinit var minimumSelectDate: Date
     var calc: Calendar = Calendar.getInstance()
     var staticCal: Calendar = Calendar.getInstance()
     var default = ""
@@ -42,7 +43,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         }
 
         previousButton.setOnClickListener {
-            if (calc.time < Date()) {
+            if (calc.time < this.minimumSelectDate) {
                 return@setOnClickListener
             }
 
@@ -80,6 +81,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
             cal.time = this.selectedDate
             cal.add(Calendar.DATE, 1)
             this.selectedDate = cal.time
+            this.minimumSelectDate = cal.time
             if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) return
         }
     }
