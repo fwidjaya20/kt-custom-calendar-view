@@ -62,6 +62,7 @@ class CalendarAdapter(
         cal.time = cell.date
         when(cal.get(Calendar.DAY_OF_WEEK)) {
             Calendar.SUNDAY, Calendar.SATURDAY -> disableClick(holder)
+            else -> enableClick(holder)
         }
     }
 
@@ -69,8 +70,8 @@ class CalendarAdapter(
         val TODAY = cell.defaultDate
         var currentYear = 1900 + cell.Y
         if (cell.M != TODAY.month || cell.Y != TODAY.year) disableClick(holder)
-        else if (cell.M == todayMonth && currentYear == todayYear){
-            if (cell.D < TODAY.date) disableClick(holder)
+         if (cell.M == todayMonth && currentYear == todayYear){
+            if (cell.D <= TODAY.date) disableClick(holder)
         }
     }
 
