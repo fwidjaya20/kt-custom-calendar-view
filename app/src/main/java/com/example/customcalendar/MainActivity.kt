@@ -1,6 +1,7 @@
 package com.example.customcalendar
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +32,9 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         calc.time = this.selectedDate
 
         this.selectTomorrowWeekDays()
+
+        Log.d("min_date", this.minimumSelectDate.toString())
+
         this.setCalendarMonthView(this.selectedDate)
         this.calendarActionListener()
         this.applyButtonListener()
@@ -43,7 +47,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         }
 
         previousButton.setOnClickListener {
-            if (calc.time < this.minimumSelectDate) {
+            if (calc.time <= this.minimumSelectDate) {
                 return@setOnClickListener
             }
 
