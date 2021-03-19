@@ -37,7 +37,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         this.selectTomorrowWeekDays()
         this.setCalendarMonthView(this.selectedDate)
         nextButton.setOnClickListener {
-            month++
+            month ++
             setToCalendar()
         }
         previousButton.setOnClickListener {
@@ -58,6 +58,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         calc.set(Calendar.MONTH, month)
         calc.set(Calendar.YEAR,year)
         val date: Date = calc.time
+        Log.i("date_is","month $date month $month")
         this.setCalendarMonthView(date)
     }
 
