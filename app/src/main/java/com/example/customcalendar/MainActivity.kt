@@ -40,15 +40,18 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
     private fun calendarActionListener() {
         nextButton.setOnClickListener {
             this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) + 1)
+            this.calc.set(Calendar.DATE, 1)
             this.setCalendarMonthView(calc.time)
         }
 
         previousButton.setOnClickListener {
             if (calc.time <= this.minimumSelectDate) {
+                this.calc.time = this.minimumSelectDate
                 return@setOnClickListener
             }
 
             this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) - 1)
+            this.calc.set(Calendar.DATE, 1)
             this.setCalendarMonthView(calc.time)
         }
     }
