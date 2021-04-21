@@ -8,7 +8,7 @@ open class CalendarCell(
     var M: Int,
     var Y : Int,
     var isDefault: Boolean,
-    var defaultDate: Date
+    var defaultDate: Calendar
 )
 
-class NullCalendarCell: CalendarCell(Date(), 0, 0, 0, false, Date())
+class NullCalendarCell: CalendarCell(Date(), 0, 0, 0, false, Calendar.getInstance())

@@ -21,6 +21,8 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
     var calc: Calendar = Calendar.getInstance()
     var staticCal: Calendar = Calendar.getInstance()
     var default = ""
+    val adapter = CalendarAdapter()
+    val formatter = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +34,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         calc.time = this.selectedDate
 
         this.selectTomorrowWeekDays()
-        this.setCalendarMonthView(this.selectedDate)
+        this.setCalendarMonthView(this.selectedDate,false)
         this.calendarActionListener()
         this.applyButtonListener()
     }
@@ -41,7 +43,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         nextButton.setOnClickListener {
             this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) + 1)
             this.calc.set(Calendar.DATE, 1)
-            this.setCalendarMonthView(calc.time)
+            this.setCalendarMonthView(calc.time, true)
         }
 
         previousButton.setOnClickListener {
@@ -52,7 +54,7 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
 
             this.calc.set(Calendar.MONTH, this.calc.get(Calendar.MONTH) - 1)
             this.calc.set(Calendar.DATE, 1)
-            this.setCalendarMonthView(calc.time)
+            this.setCalendarMonthView(calc.time,true)
         }
     }
 
@@ -62,20 +64,38 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         }
     }
 
-    private fun setCalendarMonthView(dateInput : Date) {
-        val formatter = SimpleDateFormat("MMM yyyy")
-        this.displayMonthYear.text = formatter.format(dateInput)
+
+    private fun setCalendarMonthView(dateInput : Date, isModify : Boolean) {
+        val form = SimpleDateFormat("MMM yyyy")
+        this.displayMonthYear.text = form.format(dateInput)
 
         val days: ArrayList<CalendarCell> = this.initDaysInMonth(dateInput)
         val layoutManager: RecyclerView.LayoutManager = GridLayoutManager(applicationContext, 7)
-        val adapter = CalendarAdapter(days, this)
 
+        adapter.daysOfMonth = days
         this.calendarGrid.layoutManager = layoutManager
         this.calendarGrid.setHasFixedSize(true)
         this.calendarGrid.setItemViewCacheSize(30)
+        adapter.adapterHandler = object : AdapterHandler() {
+            override fun bindAdd(selected: String) {
+                default = selected
+                btn_apply.isEnabled = true
+            }
+        }
         adapter.todayMonth = staticCal.get(Calendar.MONTH)
         adapter.todayYear = staticCal.get(Calendar.YEAR)
-        adapter.indexes = filterPosition(days)
+        adapter.todayDate = staticCal.get(Calendar.DAY_OF_MONTH)
+        if (!isModify) {
+            adapter.indexes = filterPosition(days)
+            default = formatter.format(days[filterPosition(days)].date)
+            btn_apply.isEnabled = true
+        }
+        else {
+            default = ""
+            adapter.indexes = -1
+            adapter.checkedPosition = -1
+            btn_apply.isEnabled = false
+        }
         this.calendarGrid.adapter = adapter
     }
 
@@ -97,18 +117,17 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
         firstOfMonth.time = date
         firstOfMonth.set(Calendar.DAY_OF_MONTH, 1)
         val dayOfWeek = firstOfMonth.get(Calendar.DAY_OF_WEEK) - 1
-
+        val newCal = Calendar.getInstance()
+        newCal.time = date
         firstOfMonth.add(Calendar.DAY_OF_MONTH, -dayOfWeek)
-        val formatter = SimpleDateFormat("yyyy-MM-dd")
         while (days.size < 42) {
-            val current = firstOfMonth.time
             days.add(CalendarCell(
-                current,
-                current.date,
-                current.month,
-                current.year,
-                formatter.format(current) == formatter.format(this.selectedDate),
-                date
+                firstOfMonth.time,
+                firstOfMonth.get(Calendar.DATE),
+                firstOfMonth.get(Calendar.MONTH),
+                firstOfMonth.get(Calendar.YEAR),
+                formatter.format(firstOfMonth.time) == formatter.format(this.selectedDate),
+                newCal
             ))
             firstOfMonth.add(Calendar.DAY_OF_MONTH, 1)
         }
@@ -117,7 +136,6 @@ class MainActivity: AppCompatActivity(), CalendarAdapter.OnItemListener {
 
     override fun onItemClick(position: Int, dayText: Date?) {
         if (dayText != null) {
-            val formatter = SimpleDateFormat("dd MMM yyyy")
             default = formatter.format(dayText)
             btn_apply.isEnabled = default.isNotEmpty()
         }
